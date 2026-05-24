@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Pack - IGNITUS PACKS</title>
+    <style>
+        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(0, 212, 255, 0.2); }
+        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        
+        nav { width: 100%; background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; display: flex; justify-content: center; margin-bottom: 50px; }
+        .nav-container { width: 90%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--neon-cyan); text-decoration: none; }
+        .menu a { color: #8b949e; text-decoration: none; margin-left: 20px; }
+        .menu a.active { color: var(--neon-cyan); }
+
+        .container { width: 90%; max-width: 800px; }
+        .section-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { color: var(--neon-cyan); font-size: 1.2rem; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0,212,255,0.1); padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: #8b949e; margin-bottom: 8px; font-size: 0.9rem; }
+        
+        input[type="text"], input[type="url"], select {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,212,255,0.1); }
+
+        /* GRID DE TAGS */
+        .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+        .tag-check { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #8b949e; cursor: pointer; }
+        .tag-check input { accent-color: var(--neon-cyan); }
+
+        .upload-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        .upload-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 25px var(--neon-cyan); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">IGNITUS PACKS</a>
+            <div class="menu">
+                <a href="index.html">Home</a>
+                <a href="discover.html">Discover</a>
+                <a href="upload.html" class="active">Upload</a>
+                <a href="creators.html">Pack Creators</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- SECCIÓN 1: INFO BÁSICA -->
+        <div class="section-card">
+            <h2>📦 Basic Information</h2>
+            <div class="form-group">
+                <label>Pack Name</label>
+                <input type="text" placeholder="E.g. Blue Neon PvP">
+            </div>
+            <div class="form-group">
+                <label>Pack Resolution</label>
+                <select>
+                    <option>16x16 (Default)</option>
+                    <option>32x32</option>
+                    <option>64x64</option>
+                    <option>128x128</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Bloxd Texture File (.json / .txt)</label>
+                <input type="file" style="color: #8b949e">
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: MEDIA -->
+        <div class="section-card">
+            <h2>🎥 Showcase & Media</h2>
+            <div class="form-group">
+                <label>YouTube Video URL (Optional)</label>
+                <input type="url" placeholder="https://youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+                <label>Cover Image (Banner)</label>
+                <input type="file" accept="image/*">
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: TAGS -->
+        <div class="section-card">
+            <h2>🏷️ Select Tags</h2>
+            <p style="font-size: 0.8rem; color: #555; margin-bottom: 15px;">Choose the categories that best describe your pack.</p>
+            
+            <label style="color: var(--neon-cyan); font-size: 0.7rem;">GAMEMODES</label>
+            <div class="tags-grid">
+                <label class="tag-check"><input type="checkbox"> Bedwars</label>
+                <label class="tag-check"><input type="checkbox"> Skywars</label>
+                <label class="tag-check"><input type="checkbox"> Survival</label>
+            </div>
+
+            <label style="color: var(--neon-cyan); font-size: 0.7rem; display: block; margin-top: 20px;">THEMES</label>
+            <div class="tags-grid">
+                <label class="tag-check"><input type="checkbox"> FPS Boost</label>
+                <label class="tag-check"><input type="checkbox"> Aesthetic</label>
+                <label class="tag-check"><input type="checkbox"> Anime</label>
+                <label class="tag-check"><input type="checkbox"> Custom Sky</label>
+            </div>
+        </div>
+
+        <button class="upload-btn">Publish Texture Pack</button>
+    </div>
+
+</body>
+</html>
