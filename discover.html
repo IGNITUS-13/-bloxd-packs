@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8"><title>Discover - BLOXD PACKS</title>
     <style>
-        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass-border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: sans-serif; }
-        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--glass-border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.6rem; color: var(--neon-cyan); text-decoration: none; }
+        :root { --neon: #00d4ff; --bg: #090d12; --border: rgba(0, 212, 255, 0.2); }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; }
+        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.6rem; color: var(--neon); text-decoration: none; font-weight: bold; }
         .menu { display: flex; gap: 20px; align-items: center; }
-        .menu a { color: #8b949e; text-decoration: none; }
-        .login-btn { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
-        .container { max-width: 1000px; margin: 60px auto; text-align: center; }
+        .menu a { color: #8b949e; text-decoration: none; font-size: 0.9rem; }
+        .login-btn { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
+        .container { max-width: 1000px; margin: 60px auto; text-align: center; padding: 20px; }
+        .search-bar { width: 100%; max-width: 500px; padding: 15px 25px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; outline: none; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -18,17 +19,17 @@
         <a href="index.html" class="logo">BLOXD PACKS</a>
         <div class="menu">
             <a href="index.html">Home</a>
-            <a href="discover.html" style="color:var(--neon-cyan)">Discover</a>
+            <a href="discover.html" style="color:var(--neon)">Discover</a>
             <a href="upload.html">Upload</a>
             <a href="creators.html">Creators</a>
-            <button id="loginBtn" class="login-btn" onclick="loginWithGitHub()">Login</button>
+            <div id="userAuthContainer"></div>
         </div>
     </nav>
     <div class="container">
-        <input type="text" placeholder="Search packs..." style="width:100%; max-width:500px; padding:15px; border-radius:50px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:#fff; outline:none;">
-        <p style="margin-top:50px; color:#444;">No packs yet.</p>
+        <input type="text" class="search-bar" placeholder="Search by name or creator...">
+        <div id="packsGrid" style="margin-top:50px; color:#444;">No packs uploaded yet.</div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.puter.com/v2/"></script>
     <script src="app.js"></script>
 </body>
 </html>
