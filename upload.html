@@ -1,79 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Upload - BLOXD PACKS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload - BLOXD PACKS</title>
     <style>
-        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass-border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; padding-bottom: 50px; }
-        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--glass-border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.6rem; color: var(--neon-cyan); text-decoration: none; font-weight: bold; }
+        :root { --neon: #00d4ff; --bg: #090d12; --card: rgba(255, 255, 255, 0.03); --border: rgba(0, 212, 255, 0.2); }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; padding-bottom: 50px; }
+        
+        /* NAV FIJO Y CENTRADO */
+        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--border); padding: 15px 0; display: flex; justify-content: center; position: sticky; top: 0; z-index: 1000; }
+        .nav-container { width: 90%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; color: var(--neon); text-decoration: none; font-weight: bold; text-shadow: 0 0 10px var(--neon); }
         .menu { display: flex; gap: 20px; align-items: center; }
-        .menu a { color: #8b949e; text-decoration: none; }
-        .login-btn { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
+        .menu a { color: #8b949e; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .menu a:hover { color: var(--neon); }
+
+        .login-btn { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 7px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* CONTENEDOR DEL FORMULARIO */
+        .container { max-width: 800px; margin: 50px auto; padding: 0 20px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 40px; border-radius: 20px; text-align: left; display: none; backdrop-filter: blur(10px); }
         
-        .container { max-width: 800px; margin: 50px auto; padding: 0 20px; text-align: center; }
-        .upload-card { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; text-align: left; }
+        .section-title { color: var(--neon); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin: 30px 0 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         
-        .section-title { color: var(--neon-cyan); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        input, select { width: 100%; background: #0d1117; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        
-        .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; background: #0d1117; padding: 15px; border-radius: 10px; }
+        label { display: block; color: #8b949e; font-size: 0.8rem; margin-bottom: 5px; }
+        input, select { width: 100%; background: #0d1117; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--neon); }
+
+        /* GRID DE TAGS */
+        .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; background: #0d1117; padding: 15px; border-radius: 10px; border: 1px solid #222; }
         .tag-opt { font-size: 0.8rem; color: #8b949e; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .tag-opt input { accent-color: var(--neon-cyan); }
-        
-        .publish-btn { width: 100%; background: var(--neon-cyan); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-        .publish-btn:hover { box-shadow: 0 0 20px var(--neon-cyan); transform: scale(1.02); }
+        .tag-opt input { width: auto; margin: 0; accent-color: var(--neon); }
+
+        .publish-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 40px; transition: 0.3s; }
+        .publish-btn:hover { box-shadow: 0 0 25px var(--neon); transform: scale(1.01); }
+
+        /* MENSAJE DE ERROR */
+        #loginRequiredMessage { text-align: center; margin-top: 100px; }
+        .error-box { background: rgba(255, 0, 0, 0.05); border: 1px solid #ff4b4b33; padding: 40px; border-radius: 20px; }
     </style>
 </head>
 <body>
     <nav>
-        <a href="index.html" class="logo">BLOXD PACKS</a>
-        <div class="menu">
-            <a href="index.html">Home</a>
-            <a href="discover.html">Discover</a>
-            <a href="upload.html" style="color:var(--neon-cyan)">Upload</a>
-            <a href="creators.html">Creators</a>
-            <div id="userAuthContainer"></div>
+        <div class="nav-container">
+            <a href="index.html" class="logo">BLOXD PACKS</a>
+            <div class="menu">
+                <a href="index.html">Home</a>
+                <a href="discover.html">Discover</a>
+                <a href="upload.html" style="color:var(--neon)">Upload</a>
+                <a href="creators.html">Creators</a>
+                <div id="userAuthContainer">
+                    <button class="login-btn" onclick="loginWithGitHub()">Login</button>
+                </div>
+            </div>
         </div>
     </nav>
 
     <div class="container">
+        <!-- MENSAJE SI NO ESTÁ LOGUEADO -->
         <div id="loginRequiredMessage">
-            <h2 style="color:var(--neon-cyan); font-size: 2rem; margin-bottom: 10px;">⚠️ LOGIN REQUIRED</h2>
-            <p style="color:#8b949e">Please login with GitHub to upload texture packs.</p>
-            <button class="login-btn" onclick="loginWithGitHub()" style="margin-top:20px; padding: 12px 30px;">Login Now</button>
+            <div class="error-box">
+                <h2 style="color:#ff4b4b; margin:0;">⚠️ ACCESS DENIED</h2>
+                <p style="color:#8b949e; margin: 15px 0;">Please login or create an account to upload texture packs.</p>
+                <button class="login-btn" onclick="loginWithGitHub()" style="padding: 12px 30px; font-size: 1rem;">Login with GitHub</button>
+            </div>
         </div>
 
-        <div class="upload-card" id="uploadForm" style="display:none;">
-            <h2 style="margin:0; color:#fff;">Publish your Pack</h2>
+        <!-- FORMULARIO COMPLETO -->
+        <div class="card" id="uploadForm">
+            <h2 style="margin:0; font-size: 1.8rem;">📤 Publish your Texture Pack</h2>
+            <p style="color:#8b949e; margin-bottom: 30px;">Share your creation with the Bloxd community.</p>
             
             <div class="section-title">1. Basic Information</div>
-            <input type="text" placeholder="Pack Name (e.g. Ultra FPS PvP)">
-            <select><option>16x16</option><option>32x32</option><option>64x64</option><option>128x128</option></select>
-            <label style="color:#8b949e; font-size:0.75rem;">Upload Pack File (.json / .txt)</label>
-            <input type="file">
+            <label>Pack Name</label>
+            <input type="text" id="pName" placeholder="e.g. Ultra FPS Boost V2">
+            
+            <label>Resolution</label>
+            <select id="pRes">
+                <option>16x16</option>
+                <option>32x32</option>
+                <option>64x64</option>
+                <option>128x128</option>
+            </select>
+
+            <label>Texture File (.json / .txt)</label>
+            <input type="file" id="pFile">
 
             <div class="section-title">2. Showcase & Media</div>
-            <input type="url" placeholder="YouTube Video URL (e.g. https://youtu.be/...)">
-            <label style="color:#8b949e; font-size:0.75rem;">Cover Image (Banner)</label>
-            <input type="file" accept="image/*">
+            <label>YouTube Video URL (Optional)</label>
+            <input type="url" id="pYt" placeholder="https://www.youtube.com/watch?v=...">
+
+            <label>Cover Image / Banner</label>
+            <input type="file" id="pBanner" accept="image/*">
 
             <div class="section-title">3. Select Tags</div>
             <div class="tags-grid">
-                <label class="tag-opt"><input type="checkbox"> Bedwars</label>
-                <label class="tag-opt"><input type="checkbox"> Skywars</label>
-                <label class="tag-opt"><input type="checkbox"> Bridge</label>
-                <label class="tag-opt"><input type="checkbox"> FPS Boost</label>
-                <label class="tag-opt"><input type="checkbox"> Aesthetic</label>
-                <label class="tag-opt"><input type="checkbox"> Anime</label>
-                <label class="tag-opt"><input type="checkbox"> Cyan</label>
-                <label class="tag-opt"><input type="checkbox"> Red</label>
-                <label class="tag-opt"><input type="checkbox"> Blue</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="PvP"> PvP</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Bedwars"> Bedwars</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Skywars"> Skywars</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="FPS Boost"> FPS Boost</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Aesthetic"> Aesthetic</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Anime"> Anime</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Blue"> Blue</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Red"> Red</label>
+                <label class="tag-opt"><input type="checkbox" name="tags" value="Cyan"> Cyan</label>
             </div>
 
-            <button class="publish-btn">PUBLISH TO COMMUNITY</button>
+            <button class="publish-btn" onclick="publishPack()">PUBLISH TO COMMUNITY</button>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
