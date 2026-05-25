@@ -4,22 +4,23 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLOXD PACKS | Home</title>
     <style>
-        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass-border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; }
-        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--glass-border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 1.6rem; color: var(--neon-cyan); text-decoration: none; font-weight: bold; text-shadow: 0 0 10px var(--neon-cyan); }
+        :root { --neon: #00d4ff; --bg: #090d12; --border: rgba(0, 212, 255, 0.2); }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; }
+        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.6rem; color: var(--neon); text-decoration: none; font-weight: bold; text-shadow: 0 0 10px var(--neon); }
         .menu { display: flex; gap: 20px; align-items: center; }
-        .menu a { color: #8b949e; text-decoration: none; font-weight: 500; }
-        .login-btn { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .menu a { color: #8b949e; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .menu a:hover { color: var(--neon); }
+        .login-btn { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 8px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .hero { text-align: center; margin-top: 150px; }
-        .hero h1 { font-size: 4rem; margin: 0; background: linear-gradient(90deg, #fff, var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero h1 { font-size: 4rem; margin: 0; background: linear-gradient(90deg, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
     <nav>
         <a href="index.html" class="logo">BLOXD PACKS</a>
         <div class="menu">
-            <a href="index.html" style="color:var(--neon-cyan)">Home</a>
+            <a href="index.html" style="color:var(--neon)">Home</a>
             <a href="discover.html">Discover</a>
             <a href="upload.html">Upload</a>
             <a href="creators.html">Creators</a>
@@ -27,10 +28,10 @@
         </div>
     </nav>
     <div class="hero">
-        <h1>THE NEXT GEN OF TEXTURES</h1>
-        <p style="color:#8b949e; font-size: 1.2rem;">Share and discover the best Bloxd.io texture packs.</p>
+        <h1>BLOXD PACKS</h1>
+        <p style="color:#8b949e; font-size: 1.2rem;">The pro platform for Bloxd.io textures.</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.puter.com/v2/"></script>
     <script src="app.js"></script>
 </body>
 </html>
