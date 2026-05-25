@@ -3,10 +3,11 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loginWithGitHub() {
-    await supabaseClient.auth.signInWithOAuth({
+    const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'github',
-        options: { redirectTo: window.location.origin + window.location.pathname }
+        options: { redirectTo: "https://ignitus-13.github.io/-bloxd-packs/" }
     });
+    if (error) alert("Error: " + error.message);
 }
 
 async function logout() {
@@ -14,59 +15,35 @@ async function logout() {
     window.location.href = "index.html";
 }
 
-// FUNCIONES DE PERFIL
-async function changeDisplayName() {
-    const newName = prompt("Enter your new creator name:");
-    if (!newName) return;
-    await supabaseClient.auth.updateUser({ data: { full_name: newName } });
-    location.reload();
-}
-
-async function uploadAvatar(event) {
-    const file = event.target.files[0];
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!file || !user) return;
-    const filePath = `${user.id}-${Date.now()}`;
-    await supabaseClient.storage.from('profiles').upload(filePath, file);
-    const { data: { publicUrl } } = supabaseClient.storage.from('profiles').getPublicUrl(filePath);
-    await supabaseClient.auth.updateUser({ data: { avatar_url: publicUrl } });
-    location.reload();
-}
-
-// ACTUALIZAR INTERFAZ
 async function checkUser() {
-    // Si hay un error en la URL, lo limpiamos para que no moleste
-    if (window.location.href.includes("error=")) {
-        console.log("Error detectado en la URL, limpiando...");
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
     const { data: { user } } = await supabaseClient.auth.getUser();
-    const container = document.getElementById('userAuthContainer');
+    const authContainer = document.getElementById('userAuthContainer');
+    const uploadForm = document.getElementById('uploadForm');
+    const loginMsg = document.getElementById('loginRequiredMessage');
 
-    if (user && container) {
+    if (user) {
         const avatar = user.user_metadata.avatar_url || 'https://via.placeholder.com/40';
-        const name = user.user_metadata.full_name || user.user_metadata.user_name || 'New Creator';
-
-        container.innerHTML = `
-            <div class="profile-wrap" style="position: relative; display:inline-block;">
-                <img src="${avatar}" id="profBtn" style="width:40px; height:40px; border-radius:50%; border:2px solid #00d4ff; cursor:pointer; object-fit:cover;">
-                <div id="profMenu" style="display:none; position:absolute; right:0; background:#161b22; border:1px solid #333; padding:15px; border-radius:10px; width:200px; z-index:1000; text-align:left; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <p style="margin:0; color:#00d4ff; font-weight:bold;">${name}</p>
-                    <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
-                    <button onclick="changeDisplayName()" style="background:none; border:none; color:#fff; cursor:pointer; font-size:0.8rem; display:block; padding:5px 0;">✏️ Edit Name</button>
-                    <label style="color:#fff; cursor:pointer; font-size:0.8rem; display:block; padding:5px 0;">
-                        📸 Change Photo
-                        <input type="file" hidden accept="image/*" onchange="uploadAvatar(event)">
-                    </label>
-                    <button onclick="logout()" style="background:none; border:none; color:#ff4b4b; cursor:pointer; font-size:0.8rem; display:block; padding:5px 0; margin-top:10px;">Logout</button>
-                </div>
-            </div>`;
-
-        document.getElementById('profBtn').onclick = () => {
-            const menu = document.getElementById('profMenu');
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-        };
+        if (authContainer) {
+            authContainer.innerHTML = `
+                <div class="profile-container" style="position:relative;">
+                    <img src="${avatar}" id="profBtn" style="width:35px; height:35px; border-radius:50%; border:2px solid #00d4ff; cursor:pointer;">
+                    <div id="profMenu" style="display:none; position:absolute; right:0; background:#161b22; border:1px solid #333; padding:15px; border-radius:10px; min-width:160px; z-index:1000; box-shadow:0 10px 30px #000;">
+                        <p style="margin:0; color:#00d4ff; font-weight:bold;">${user.user_metadata.full_name || 'Creator'}</p>
+                        <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+                        <button onclick="logout()" style="background:none; border:none; color:#ff4b4b; cursor:pointer; width:100%; text-align:left;">Logout</button>
+                    </div>
+                </div>`;
+            document.getElementById('profBtn').onclick = () => {
+                const m = document.getElementById('profMenu');
+                m.style.display = m.style.display === 'none' ? 'block' : 'none';
+            };
+        }
+        if (uploadForm) uploadForm.style.display = 'block';
+        if (loginMsg) loginMsg.style.display = 'none';
+    } else {
+        if (authContainer) authContainer.innerHTML = `<button class="login-btn" onclick="loginWithGitHub()">Login</button>`;
+        if (uploadForm) uploadForm.style.display = 'none';
+        if (loginMsg) loginMsg.style.display = 'block';
     }
 }
 
