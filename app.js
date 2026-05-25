@@ -1,29 +1,54 @@
-const SUPABASE_URL = "https://prcigukboydnkmntugsp.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByY2lndWtib3lkbmttbnR1Z3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzA2OTUsImV4cCI6MjA5NTIwNjY5NX0._JF8SihpTgtGyXOFRcoGmPqBYvHwlOM_3VNq1ufqQJs";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// CONFIGURACIÓN DE PUTER - TU APP ID REAL
+const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
 
-// 1. FUNCIÓN DE LOGIN (GitHub)
+// FUNCIÓN PARA LOGIN
 async function login() {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'github',
-        options: { 
-            redirectTo: window.location.origin + window.location.pathname 
-        }
-    });
-    if (error) alert("Error: " + error.message);
+    try {
+        // Puter abre la ventanita pro con Google, GitHub, Microsoft
+        await puter.auth.signIn();
+        location.reload(); // Recarga para aplicar los cambios
+    } catch (err) {
+        console.log("Login cancelado");
+    }
 }
 
-// 2. FUNCIÓN DE LOGOUT
-async function logout() {
-    await supabaseClient.auth.signOut();
-    window.location.reload();
+// FUNCIÓN PARA LOGOUT
+function logout() {
+    puter.auth.signOut();
+    location.reload();
 }
 
-// 3. EL "SENSOR" DE LOGIN (Actualiza la web automáticamente)
-supabaseClient.auth.onAuthStateChange((event, session) => {
-    const user = session?.user;
-    const authContainer = document.getElementById('userAuthContainer');
+// SENSOR DE USUARIO (Esto controla toda la web)
+async function checkUser() {
+    const btnContainer = document.getElementById('userAuthContainer');
     const uploadForm = document.getElementById('uploadForm');
     const loginMsg = document.getElementById('loginRequiredMessage');
 
-    if (user) {
+    if (puter.auth.isSignedIn()) {
+        const user = await puter.auth.getUser();
+        
+        // SI ESTÁ LOGUEADO: Mostrar Logout
+        if (btnContainer) {
+            btnContainer.innerHTML = `
+                <button onclick="logout()" style="background:transparent; color:#ff4b4b; border:1px solid #ff4b4b; padding:8px 18px; border-radius:5px; cursor:pointer; font-weight:bold;">Logout</button>
+            `;
+        }
+        // MOSTRAR FORMULARIO EN upload.html
+        if (uploadForm) uploadForm.style.display = 'block';
+        if (loginMsg) loginMsg.style.display = 'none';
+        
+        console.log("¡Conectado como:", user.username);
+    } else {
+        // SI NO ESTÁ LOGUEADO: Mostrar Login
+        if (btnContainer) {
+            btnContainer.innerHTML = `
+                <button onclick="login()" style="background:transparent; color:#00d4ff; border:1px solid #00d4ff; padding:8px 18px; border-radius:5px; cursor:pointer; font-weight:bold;">Login</button>
+            `;
+        }
+        // BLOQUEAR SUBIDA
+        if (uploadForm) uploadForm.style.display = 'none';
+        if (loginMsg) loginMsg.style.display = 'block';
+    }
+}
+
+// Iniciar Puter y chequear usua
