@@ -1,62 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload - BLOXD PACKS</title>
+    <meta charset="UTF-8"><title>Upload - BLOXD PACKS</title>
     <style>
-        /* Mismos estilos de navegación */
-        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: 'Segoe UI', sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; }
-        nav { width: 100%; background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; display: flex; justify-content: center; position: sticky; top: 0; z-index: 1000; }
-        .nav-container { width: 90%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.6rem; font-weight: 800; color: var(--neon-cyan); text-decoration: none; }
+        :root { --neon-cyan: #00d4ff; --dark-bg: #090d12; --glass-border: rgba(0, 212, 255, 0.2); }
+        body { margin: 0; background: var(--dark-bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; padding-bottom: 50px; }
+        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--glass-border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.6rem; color: var(--neon-cyan); text-decoration: none; font-weight: bold; }
         .menu { display: flex; gap: 20px; align-items: center; }
         .menu a { color: #8b949e; text-decoration: none; }
-        .nav-avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--neon-cyan); cursor: pointer; }
-        .profile-container { position: relative; }
-        .dropdown-content { display: none; position: absolute; right: 0; background: #0d1117; border: 1px solid var(--glass-border); min-width: 180px; padding: 15px; border-radius: 10px; margin-top: 10px; z-index: 1001; }
-        .dropdown-content.show { display: block; }
-        .login-btn { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 20px; border-radius: 5px; cursor: pointer; }
-
-        .container { width: 90%; max-width: 800px; margin: 50px auto; }
-        .upload-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px); }
-        h2 { color: var(--neon-cyan); border-bottom: 1px solid rgba(0,212,255,0.1); padding-bottom: 10px; margin-bottom: 20px; }
-        input, select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 20px; }
-        .submit-btn { width: 100%; background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .submit-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 20px var(--neon-cyan); }
+        .login-btn { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
+        
+        .container { max-width: 800px; margin: 50px auto; padding: 0 20px; text-align: center; }
+        .upload-card { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; text-align: left; }
+        
+        .section-title { color: var(--neon-cyan); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        input, select { width: 100%; background: #0d1117; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        
+        .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; background: #0d1117; padding: 15px; border-radius: 10px; }
+        .tag-opt { font-size: 0.8rem; color: #8b949e; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .tag-opt input { accent-color: var(--neon-cyan); }
+        
+        .publish-btn { width: 100%; background: var(--neon-cyan); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 30px; transition: 0.3s; }
+        .publish-btn:hover { box-shadow: 0 0 20px var(--neon-cyan); transform: scale(1.02); }
     </style>
 </head>
 <body>
     <nav>
+        <a href="index.html" class="logo">BLOXD PACKS</a>
         <div class="menu">
-    <a href="index.html">Home</a>
-    <a href="discover.html">Discover</a>
-    <a href="upload.html">Upload</a>
-    <a href="creators.html">Creators</a>
-    <!-- EL BOTÓN TIENE QUE ESTAR EN TODOS LOS ARCHIVOS -->
-    <button id="loginBtn" class="login-btn" onclick="loginWithGitHub()">Login</button>
-</div>
+            <a href="index.html">Home</a>
+            <a href="discover.html">Discover</a>
+            <a href="upload.html" style="color:var(--neon-cyan)">Upload</a>
+            <a href="creators.html">Creators</a>
+            <div id="userAuthContainer"></div>
+        </div>
+    </nav>
 
     <div class="container">
-        <div class="upload-card">
-            <h2>📤 Upload Texture Pack</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Fill the information to share your pack with the world.</p>
-            
-            <label style="color:#8b949e; font-size: 0.8rem;">Pack Name</label>
-            <input type="text" placeholder="E.g. Blue Galaxy PvP">
-            
-            <label style="color:#8b949e; font-size: 0.8rem;">Resolution</label>
-            <select>
-                <option>16x16</option>
-                <option>32x32</option>
-                <option>64x64</option>
-            </select>
+        <div id="loginRequiredMessage">
+            <h2 style="color:var(--neon-cyan); font-size: 2rem; margin-bottom: 10px;">⚠️ LOGIN REQUIRED</h2>
+            <p style="color:#8b949e">Please login with GitHub to upload texture packs.</p>
+            <button class="login-btn" onclick="loginWithGitHub()" style="margin-top:20px; padding: 12px 30px;">Login Now</button>
+        </div>
 
-            <button class="submit-btn">PUBLISH PACK</button>
+        <div class="upload-card" id="uploadForm" style="display:none;">
+            <h2 style="margin:0; color:#fff;">Publish your Pack</h2>
+            
+            <div class="section-title">1. Basic Information</div>
+            <input type="text" placeholder="Pack Name (e.g. Ultra FPS PvP)">
+            <select><option>16x16</option><option>32x32</option><option>64x64</option><option>128x128</option></select>
+            <label style="color:#8b949e; font-size:0.75rem;">Upload Pack File (.json / .txt)</label>
+            <input type="file">
+
+            <div class="section-title">2. Showcase & Media</div>
+            <input type="url" placeholder="YouTube Video URL (e.g. https://youtu.be/...)">
+            <label style="color:#8b949e; font-size:0.75rem;">Cover Image (Banner)</label>
+            <input type="file" accept="image/*">
+
+            <div class="section-title">3. Select Tags</div>
+            <div class="tags-grid">
+                <label class="tag-opt"><input type="checkbox"> Bedwars</label>
+                <label class="tag-opt"><input type="checkbox"> Skywars</label>
+                <label class="tag-opt"><input type="checkbox"> Bridge</label>
+                <label class="tag-opt"><input type="checkbox"> FPS Boost</label>
+                <label class="tag-opt"><input type="checkbox"> Aesthetic</label>
+                <label class="tag-opt"><input type="checkbox"> Anime</label>
+                <label class="tag-opt"><input type="checkbox"> Cyan</label>
+                <label class="tag-opt"><input type="checkbox"> Red</label>
+                <label class="tag-opt"><input type="checkbox"> Blue</label>
+            </div>
+
+            <button class="publish-btn">PUBLISH TO COMMUNITY</button>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
