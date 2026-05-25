@@ -1,14 +1,9 @@
-// 1. CONFIGURACIÓN DE PUTER (TU APP ID)
 const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
 
-// 2. FUNCIONES DE LOGIN / LOGOUT
+// FUNCIONES DE ACCESO
 async function handleLogin() {
-    try {
-        await puter.auth.signIn();
-        location.reload();
-    } catch (err) {
-        console.log("Login canceled");
-    }
+    await puter.auth.signIn();
+    location.reload();
 }
 
 function handleLogout() {
@@ -16,62 +11,84 @@ function handleLogout() {
     location.reload();
 }
 
-// 3. CARGAR LEADERBOARD (TABLA DE CREADORES)
-async function loadLeaderboard() {
-    const tbody = document.getElementById('leaderboardBody');
-    if (!tbody) return;
-    tbody.innerHTML = `
-        <tr>
-            <td>#1</td>
-            <td><strong>IGNITUS-13</strong></td>
-            <td>0 Packs</td>
-            <td style="color:#00d4ff;">★ 0</td>
-        </tr>
-        <tr>
-            <td colspan="4" style="color:#444; font-size:0.8rem; padding:20px;">
-                Waiting for more creators...
-            </td>
-        </tr>
-    `;
+// CAMBIAR NOMBRE
+async function editName() {
+    const newName = prompt("Enter your new creator name:");
+    if (newName) {
+        // Guardamos el nombre en el almacenamiento de Puter
+        await puter.kv.set('user_name', newName);
+        location.reload();
+    }
 }
 
-// 4. CARGAR PACKS (PÁGINA DISCOVER)
-async function loadDiscover() {
-    const grid = document.getElementById('packsGrid');
-    if (!grid) return;
-    grid.innerHTML = `<p style="color:#555;">No packs uploaded yet.</p>`;
+// CAMBIAR FOTO (Simulación funcional)
+async function uploadPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Convertimos la imagen a una URL que el navegador entienda
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const imageUrl = e.target.result;
+        await puter.kv.set('user_avatar', imageUrl);
+        location.reload();
+    };
+    reader.readAsDataURL(file);
 }
 
-// 5. FUNCIÓN PRINCIPAL QUE CONTROLA LA INTERFAZ
+// SENSOR DE USUARIO Y CONSTRUCCIÓN DE PERFIL
 async function initApp() {
-    const authContainer = document.getElementById('userAuthContainer');
-    const uploadForm = document.getElementById('uploadForm');
-    const loginMsg = document.getElementById('loginRequiredMessage');
+    const container = document.getElementById('userAuthContainer');
+    if (!container) return;
 
     if (puter.auth.isSignedIn()) {
-        // SI ESTÁ LOGUEADO
         const user = await puter.auth.getUser();
-        if (authContainer) {
-            authContainer.innerHTML = `<button onclick="handleLogout()" style="background:transparent; color:#ff4b4b; border:1px solid #ff4b4b; padding:8px 18px; border-radius:5px; cursor:pointer; font-weight:bold;">Logout</button>`;
-        }
-        if (uploadForm) uploadForm.style.display = 'block';
-        if (loginMsg) loginMsg.style.display = 'none';
-        console.log("Connectado como:", user.username);
+        
+        // Recuperar nombre y foto personalizada o usar los de defecto
+        const savedName = await puter.kv.get('user_name') || user.username;
+        const savedAvatar = await puter.kv.get('user_avatar') || 'https://via.placeholder.com/100?text=User';
+
+        container.innerHTML = `
+            <div class="profile-wrapper">
+                <!-- Foto pequeña de la Navbar -->
+                <img src="${savedAvatar}" class="nav-avatar" id="navAvatarBtn">
+
+                <!-- Ventanita de Perfil (tipo Google) -->
+                <div class="profile-card" id="profileCard">
+                    <div class="avatar-big-wrapper">
+                        <img src="${savedAvatar}" class="avatar-big">
+                        <label for="fileInput" class="camera-overlay">
+                            <span>📷</span>
+                            <input type="file" id="fileInput" hidden accept="image/*" onchange="uploadPhoto(event)">
+                        </label>
+                    </div>
+                    <h3 class="display-name">${savedName}</h3>
+                    <p class="user-email">${user.email || 'Bloxd Creator'}</p>
+                    
+                    <div class="menu-options">
+                        <button onclick="editName()" class="opt-btn">✏️ Edit Name</button>
+                        <button onclick="handleLogout()" class="opt-btn logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Lógica para abrir/cerrar el menú
+        const btn = document.getElementById('navAvatarBtn');
+        const card = document.getElementById('profileCard');
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            card.classList.toggle('show');
+        };
+        document.onclick = () => card.classList.remove('show');
+        card.onclick = (e) => e.stopPropagation();
+
     } else {
-        // SI NO ESTÁ LOGUEADO
-        if (authContainer) {
-            authContainer.innerHTML = `<button onclick="handleLogin()" style="background:transparent; color:#00d4ff; border:1px solid #00d4ff; padding:8px 18px; border-radius:5px; cursor:pointer; font-weight:bold;">Login</button>`;
-        }
-        if (uploadForm) uploadForm.style.display = 'none';
-        if (loginMsg) loginMsg.style.display = 'block';
+        container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
     }
-    
-    // Cargar contenido de las páginas
-    loadLeaderboard();
-    loadDiscover();
 }
 
-// --- EL CÓDIGO QUE ME DISTE: ESPERAR A QUE PUTER ESTÉ LISTO ---
+// Esperar a Puter y ejecutar
 async function waitForPuter() {
     while (typeof puter === 'undefined' || !puter.auth) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -79,8 +96,6 @@ async function waitForPuter() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Waiting for Puter...");
     await waitForPuter();
-    console.log("Puter ready! Initializing app...");
     initApp();
 });
