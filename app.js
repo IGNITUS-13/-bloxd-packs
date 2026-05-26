@@ -67,23 +67,18 @@ async function loadLeaderboard() {
     }
 }
 
-// CONSTRUIR LA INTERFAZ UNIVERSAL
+// CONSTRUIR LA INTERFAZ
 async function initApp() {
     const container = document.getElementById('userAuthContainer');
     const uploadForm = document.getElementById('uploadForm');
     const loginMsg = document.getElementById('loginRequiredMessage');
     const leaderboardBody = document.getElementById('leaderboardBody');
 
-    // CORRECCIÓN 1: Cargar el Leaderboard si existe la tabla (no importa si está logueado o no)
-    if (leaderboardBody) {
-        await loadLeaderboard();
-    }
-
     if (puter.auth.isSignedIn()) {
         const user = await puter.auth.getUser();
         
         const savedName = await puter.kv.get('user_name') || user.username;
-        const savedAvatar = await puter.kv.get('user_avatar') || 'https://placeholder.com';
+        const savedAvatar = await puter.kv.get('user_avatar') || 'https://via.placeholder.com/100?text=User';
 
         if (container) {
             container.innerHTML = `
@@ -114,23 +109,25 @@ async function initApp() {
             }
         }
 
-        // CORRECCIÓN 2: Modificar los bloques de subida solo si existen en la página actual (Upload.html)
+        // MOSTRAR FORMULARIOS DE UPLOAD
         if (uploadForm) uploadForm.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
 
+        // Cargar datos de creadores
+        if (leaderboardBody) {
+            await loadLeaderboard();
+        }
+
     } else {
-        // Modo visitante / No logueado
         if (container) {
             container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
         }
-        
-        // CORRECCIÓN 3: Modificar de forma segura solo si existen en la página actual
         if (uploadForm) uploadForm.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
     }
 }
 
-// Esperar a que Puter cargue de forma segura
+// Esperar a que Puter cargue
 async function waitForPuter() {
     while (typeof puter === 'undefined' || !puter.auth) {
         await new Promise(resolve => setTimeout(resolve, 100));
