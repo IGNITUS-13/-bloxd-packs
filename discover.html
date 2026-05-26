@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Discover - BLOXD PACKS</title>
+    <meta charset="UTF-8">
+    <title>Discover - BLOXD PACKS</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --neon: #00d4ff; --bg: #090d12; --border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; }
-        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 1.6rem; color: var(--neon); text-decoration: none; font-weight: bold; }
-        .menu { display: flex; gap: 20px; align-items: center; }
-        .menu a { color: #8b949e; text-decoration: none; font-size: 0.9rem; }
-        .login-btn { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
         .container { max-width: 1000px; margin: 60px auto; text-align: center; padding: 20px; }
         .search-bar { width: 100%; max-width: 500px; padding: 15px 25px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; outline: none; font-size: 1rem; }
+        .search-bar::placeholder { color: #8b949e; }
     </style>
 </head>
 <body>
@@ -26,6 +22,7 @@
         </div>
     </nav>
     <div class="container">
+        <h1 style="text-shadow: 0 0 15px var(--neon);">🔍 Discover Packs</h1>
         <input type="text" class="search-bar" placeholder="Search by name or creator...">
         <div id="packsGrid" style="margin-top:50px; color:#444;">No packs uploaded yet.</div>
     </div>

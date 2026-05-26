@@ -46,11 +46,33 @@ async function uploadPhoto(event) {
     reader.readAsDataURL(file);
 }
 
+// Cargar datos del leaderboard de creadores
+async function loadLeaderboard() {
+    const creators = [
+        { rank: 1, name: 'Creator1', packs: 15, stars: 342 },
+        { rank: 2, name: 'Creator2', packs: 12, stars: 298 },
+        { rank: 3, name: 'IGNITUS', packs: 8, stars: 156 }
+    ];
+
+    const leaderboardBody = document.getElementById('leaderboardBody');
+    if (leaderboardBody) {
+        leaderboardBody.innerHTML = creators.map(c => `
+            <tr>
+                <td>${c.rank}</td>
+                <td>${c.name}</td>
+                <td>${c.packs}</td>
+                <td>⭐ ${c.stars}</td>
+            </tr>
+        `).join('');
+    }
+}
+
 // CONSTRUIR LA INTERFAZ
 async function initApp() {
     const container = document.getElementById('userAuthContainer');
     const uploadForm = document.getElementById('uploadForm');
     const loginMsg = document.getElementById('loginRequiredMessage');
+    const leaderboardBody = document.getElementById('leaderboardBody');
 
     if (puter.auth.isSignedIn()) {
         const user = await puter.auth.getUser();
@@ -80,13 +102,21 @@ async function initApp() {
 
             const btn = document.getElementById('navAvatarBtn');
             const card = document.getElementById('profileCard');
-            btn.onclick = (e) => { e.stopPropagation(); card.classList.toggle('show'); };
-            document.onclick = () => card.classList.remove('show');
-            card.onclick = (e) => e.stopPropagation();
+            if (btn && card) {
+                btn.onclick = (e) => { e.stopPropagation(); card.classList.toggle('show'); };
+                document.onclick = () => card.classList.remove('show');
+                card.onclick = (e) => e.stopPropagation();
+            }
         }
 
+        // MOSTRAR FORMULARIOS DE UPLOAD
         if (uploadForm) uploadForm.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
+
+        // Cargar datos de creadores
+        if (leaderboardBody) {
+            await loadLeaderboard();
+        }
 
     } else {
         if (container) {
@@ -97,12 +127,14 @@ async function initApp() {
     }
 }
 
+// Esperar a que Puter cargue
 async function waitForPuter() {
     while (typeof puter === 'undefined' || !puter.auth) {
         await new Promise(resolve => setTimeout(resolve, 100));
     }
 }
 
+// Iniciar la app cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', async () => {
     await waitForPuter();
     initApp();

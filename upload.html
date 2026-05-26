@@ -1,25 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Upload - BLOXD PACKS</title>
+    <meta charset="UTF-8">
+    <title>Upload - BLOXD PACKS</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --neon: #00d4ff; --bg: #090d12; --border: rgba(0, 212, 255, 0.2); }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; background-image: radial-gradient(circle at 50% -20%, #102a43, #090d12); min-height: 100vh; padding-bottom: 50px; }
-        nav { background: rgba(13, 17, 23, 0.95); border-bottom: 1px solid var(--border); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.6rem; color: var(--neon); text-decoration: none; font-weight: bold; }
-        .menu { display: flex; gap: 20px; align-items: center; }
-        .menu a { color: #8b949e; text-decoration: none; font-size: 0.9rem; }
-        .login-btn { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 8px 18px; border-radius: 5px; cursor: pointer; }
-        
         .container { max-width: 800px; margin: 50px auto; padding: 0 20px; text-align: center; }
         .card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 40px; border-radius: 20px; text-align: left; display: none; backdrop-filter: blur(10px); }
         .section-title { color: var(--neon); text-transform: uppercase; font-size: 0.8rem; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         input, select { width: 100%; background: #0d1117; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        
+        input::placeholder { color: #8b949e; }
         .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; background: #0d1117; padding: 15px; border-radius: 10px; }
         .tag-opt { font-size: 0.8rem; color: #8b949e; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .publish-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 30px; }
-        
+        .publish-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 30px; transition: 0.3s; }
+        .publish-btn:hover { background: #00b8cc; }
         #loginRequiredMessage { margin-top: 100px; }
         .neon-box { border: 1px solid #ff4b4b33; padding: 40px; border-radius: 20px; background: rgba(255,0,0,0.02); }
     </style>
