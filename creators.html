@@ -1,43 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Creators - BLOXD PACKS</title>
+    <meta charset="UTF-8"><title>Creators - BLOXD PACKS</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .container { max-width: 900px; margin: 60px auto; text-align: center; }
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 15px; overflow: hidden; border: 1px solid var(--border); }
         th { background: rgba(0, 212, 255, 0.1); color: var(--neon); padding: 20px; text-transform: uppercase; font-size: 0.8rem; }
         td { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        tr:hover { background: rgba(0, 212, 255, 0.05); }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="logo">BLOXD PACKS</a>
-        <div class="menu">
-            <a href="index.html">Home</a>
-            <a href="discover.html">Discover</a>
-            <a href="upload.html">Upload</a>
-            <a href="creators.html" style="color:var(--neon)">Creators</a>
-            <div id="userAuthContainer"></div>
-        </div>
-    </nav>
+    <nav><a href="index.html" class="logo">BLOXD PACKS</a><div class="menu"><a href="index.html">Home</a><a href="discover.html">Discover</a><a href="upload.html">Upload</a><a href="creators.html" style="color:var(--neon)">Creators</a><div id="userAuthContainer"></div></div></nav>
     <div class="container">
         <h1 style="text-shadow: 0 0 15px var(--neon);">👑 Top Creators</h1>
         <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Creator</th>
-                    <th>Packs</th>
-                    <th>Stars</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboardBody"></tbody>
+            <thead><tr><th>Rank</th><th>Creator</th><th>Packs</th><th>Stars</th></tr></thead>
+            <tbody id="leaderboardBody">
+                <!-- Se llena dinámicamente -->
+            </tbody>
         </table>
     </div>
-    <script src="https://js.puter.com/v2/"></script>
-    <script src="app.js"></script>
+    <script src="https://js.puter.com/v2/"></script><script src="app.js"></script>
 </body>
 </html>
