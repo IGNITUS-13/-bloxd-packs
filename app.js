@@ -139,3 +139,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     await waitForPuter();
     initApp();
 });
+
+
+// ==========================================
+// NUEVA FUNCIÓN: ACCIÓN DEL BOTÓN PUBLISH PACK
+// ==========================================
+document.addEventListener('click', async (event) => {
+    if (event.target && event.target.classList.contains('publish-btn')) {
+        event.preventDefault();
+
+        // Capturar los valores del formulario de forma segura
+        const packNameInput = document.getElementById('pName');
+        const packName = packNameInput ? packNameInput.value.trim() : '';
+        
+        const packResolutionInput = document.getElementById('pRes');
+        const packResolution = packResolutionInput ? packResolutionInput.value : '16x16';
+        
+        const youtubeInput = document.querySelector('input[type="url"]');
+        const youtubeUrl = youtubeInput ? youtubeInput.value.trim() : '';
+
+        // Validar que el campo obligatorio de nombre no esté vacío
+        if (!packName) {
+            alert("Please enter a Pack Name before publishing.");
+            return;
+        }
+
+        // Capturar las etiquetas que el usuario seleccionó
+        const selectedTags = [];
+        const checkboxes = document.querySelectorAll('.tags-grid input[type="checkbox"]');
+        checkboxes.forEach(box => {
+            if (box.checked) {
+                selectedTags.push(box.parentElement.innerText.trim());
+            }
+        });
+
+        // Feedback visual en el botón
+        const originalText = event.target.innerText;
+        event.target.innerText = "PUBLISHING...";
+        event.target.disabled = true;
+
+        try {
+            // Obtener packs existentes de Puter KV
+            const existingPacksRaw = await puter.kv.get('uploaded_packs');
+            let packsList = [];
+            if (existingPacksRaw) {
+                packsList = JSON.parse(existingPacksRaw);
+            }
+
+            // Obtener nombre del creador activo
+            const nameLabel = document.querySelector('.display-name');
+            const creatorName = nameLabel ? nameLabel.innerText : 'Unknown';
+
+            // Estructura del nuevo pack a guardar
+            const newPack = {
+                id: 'pack-' + Date.now(),
+                name: packName,
+                resolution: packResolution,
+                youtube: youtubeUrl,
+                tags: selectedTags,
+                creator: creatorName,
+                date: new Date().toLocaleDateString()
+            };
+
+            // Guardar lista actualizada en Puter
+            packsList.push(newPack);
+            await puter.kv.set('uploaded_packs', JSON.stringify(packsList));
+
+            alert("🚀 Pack published successfully!");
+            
+            // Limpiar el formulario tras publicar exitosamente
+            if (packNameInput) packNameInput.value = '';
+            if (youtubeInput) youtubeInput.value = '';
+            checkboxes.forEach(box => box.checked = false);
+
+        } catch (error) {
+            console.error("Error saving pack:", error);
+            alert("❌ Error publishing pack. Please try again.");
+        } finally {
+            // Restaurar estado del botón
+            event.target.innerText = originalText;
+            event.target.disabled = false;
+        }
+    }
+});
