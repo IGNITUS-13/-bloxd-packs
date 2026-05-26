@@ -1,22 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Upload - BLOXD PACKS</title>
+    <meta charset="UTF-8"><title>Upload - BLOXD PACKS</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .container { max-width: 800px; margin: 50px auto; padding: 0 20px; text-align: center; }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 40px; border-radius: 20px; text-align: left; display: none; backdrop-filter: blur(10px); }
-        .section-title { color: var(--neon); text-transform: uppercase; font-size: 0.8rem; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        input, select { width: 100%; background: #0d1117; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        input::placeholder { color: #8b949e; }
-        .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; background: #0d1117; padding: 15px; border-radius: 10px; }
-        .tag-opt { font-size: 0.8rem; color: #8b949e; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .publish-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-        .publish-btn:hover { background: #00b8cc; }
-        #loginRequiredMessage { margin-top: 100px; }
-        .neon-box { border: 1px solid #ff4b4b33; padding: 40px; border-radius: 20px; background: rgba(255,0,0,0.02); }
-    </style>
 </head>
 <body>
     <nav>
@@ -29,36 +15,16 @@
             <div id="userAuthContainer"></div>
         </div>
     </nav>
-
-    <div class="container">
-        <div id="loginRequiredMessage">
-            <div class="neon-box">
-                <h2 style="color:#ff4b4b;">⚠️ LOGIN REQUIRED</h2>
-                <p style="color:#8b949e">Please login or create an account to upload texture packs.</p>
-            </div>
+    <div style="max-width:600px; margin:50px auto; padding:20px; text-align:center;">
+        <div id="loginRequiredMessage" style="border:1px solid #ff4b4b33; padding:40px; border-radius:20px;">
+            <h2 style="color:#ff4b4b;">⚠️ LOGIN REQUIRED</h2>
+            <button class="login-btn" onclick="handleLogin()">Login Now</button>
         </div>
-
-        <div class="card" id="uploadForm">
-            <h2 style="margin:0;">📤 Publish your Pack</h2>
-            <div class="section-title">1. Basic Info</div>
-            <input type="text" id="pName" placeholder="Pack Name">
-            <select id="pRes"><option>16x16</option><option>32x32</option><option>64x64</option></select>
-            <label style="font-size:0.8rem; color:#8b949e;">Pack File (.json/.txt)</label>
-            <input type="file">
-
-            <div class="section-title">2. Media</div>
-            <input type="url" placeholder="YouTube Video URL">
-            <label style="font-size:0.8rem; color:#8b949e;">Cover Image (Banner)</label>
-            <input type="file" accept="image/*">
-
-            <div class="section-title">3. Tags</div>
-            <div class="tags-grid">
-                <label class="tag-opt"><input type="checkbox"> PvP</label>
-                <label class="tag-opt"><input type="checkbox"> Bedwars</label>
-                <label class="tag-opt"><input type="checkbox"> FPS Boost</label>
-                <label class="tag-opt"><input type="checkbox"> Anime</label>
-            </div>
-            <button class="publish-btn">PUBLISH PACK</button>
+        <div id="uploadForm" class="profile-card" style="display:none; position:static; width:100%;">
+            <h2 style="margin-top:0;">Publish Pack</h2>
+            <input type="text" id="pName" placeholder="Pack Name" style="width:100%; padding:12px; background:#0d1117; border:1px solid #333; color:#fff; border-radius:8px; margin-bottom:15px;">
+            <select id="pRes" style="width:100%; padding:12px; background:#0d1117; border:1px solid #333; color:#fff; border-radius:8px; margin-bottom:15px;"><option>16x16</option><option>32x32</option><option>64x64</option></select>
+            <button class="opt-btn" style="background:var(--neon); color:#000; font-weight:bold;" onclick="publishPack()">PUBLISH TO COMMUNITY</button>
         </div>
     </div>
     <script src="https://js.puter.com/v2/"></script>
