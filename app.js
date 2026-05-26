@@ -1,11 +1,11 @@
 const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
 
-// --- PERFIL Y AUTH ---
+// --- AUTH ---
 async function handleLogin() { await puter.auth.signIn(); location.reload(); }
 function handleLogout() { puter.auth.signOut(); location.reload(); }
 
 async function editName() {
-    const n = prompt("New Name:");
+    const n = prompt("New Creator Name:");
     if (n) { await puter.kv.set('user_name', n); location.reload(); }
 }
 
@@ -20,55 +20,78 @@ async function uploadPhoto(event) {
     reader.readAsDataURL(file);
 }
 
-// --- LÓGICA DE PACKS (SUBIR) ---
+// --- SISTEMA DE PACKS REAL ---
 async function publishPack() {
     const name = document.getElementById('pName').value;
     const res = document.getElementById('pRes').value;
-    if (!name) return alert("Enter pack name!");
+    const yt = document.getElementById('pYt').value;
+    
+    // Obtener Tags seleccionados
+    const selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+
+    if (!name) return alert("Please enter a Pack Name!");
 
     const user = await puter.auth.getUser();
     const creator = await puter.kv.get('user_name') || user.username;
 
-    const newPack = { name, res, creator, date: Date.now(), stars: 0 };
+    const newPack = {
+        name,
+        res,
+        yt,
+        tags: selectedTags,
+        creator,
+        date: Date.now(),
+        stars: 0
+    };
+
     let list = await puter.kv.get('community_packs') || [];
-    list.unshift(newPack); // Poner al principio
+    list.unshift(newPack);
     await puter.kv.set('community_packs', list);
 
-    alert("Pack Published!");
+    alert("¡Pack Published Successfully!");
     window.location.href = "discover.html";
 }
 
-// --- CARGAR DATOS EN LAS PÁGINAS ---
+// --- CARGAR CONTENIDO DINÁMICO ---
 async function loadContent() {
     const packs = await puter.kv.get('community_packs') || [];
     const grid = document.getElementById('packsGrid');
     const tbody = document.getElementById('leaderboardBody');
 
-    // 1. Mostrar Packs (Home/Discover)
+    // 1. Discover / Home
     if (grid) {
         grid.innerHTML = packs.length ? packs.map(p => `
             <div class="pack-card">
-                <div class="pack-img" style="display:flex; align-items:center; justify-content:center; color:#222">No Preview</div>
+                <div class="pack-img" style="display:flex; align-items:center; justify-content:center; background:#0d1117; height:150px; color:#222;">No Preview</div>
                 <div class="pack-info">
-                    <h3 style="margin:0; color:var(--neon)">${p.name}</h3>
-                    <p style="font-size:0.8rem; color:#8b949e">by ${p.creator} | ${p.res}</p>
+                    <h3 style="margin:0; color:var(--neon);">${p.name}</h3>
+                    <p style="font-size:0.8rem; color:#8b949e;">by ${p.creator} | ${p.res}</p>
+                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">
+                        ${p.tags ? p.tags.map(t => `<span style="font-size:0.6rem; background:rgba(0,212,255,0.1); color:var(--neon); padding:2px 6px; border-radius:4px;">${t}</span>`).join('') : ''}
+                    </div>
                 </div>
             </div>
-        `).join('') : '<p>No packs yet.</p>';
+        `).join('') : '<p style="color:#444;">No packs uploaded yet.</p>';
     }
 
-    // 2. Leaderboard Real
+    // 2. Leaderboard REAL (Sin nombres falsos)
     if (tbody) {
         const stats = {};
         packs.forEach(p => stats[p.creator] = (stats[p.creator] || 0) + 1);
         const sorted = Object.keys(stats).map(name => ({name, count: stats[name]})).sort((a,b) => b.count - a.count);
-        tbody.innerHTML = sorted.map((c, i) => `
-            <tr><td>${i+1}</td><td>${c.name}</td><td>${c.count}</td><td>⭐ 0</td></tr>
-        `).join('');
+        
+        tbody.innerHTML = sorted.length ? sorted.map((c, i) => `
+            <tr>
+                <td>#${i+1}</td>
+                <td><strong>${c.name}</strong></td>
+                <td>${c.count} Packs</td>
+                <td style="color:#ffd700;">★ 0</td>
+            </tr>
+        `).join('') : '<tr><td colspan="4">No creators yet.</td></tr>';
     }
 }
 
-// --- INICIALIZAR ---
+// --- INIT ---
 async function initApp() {
     const container = document.getElementById('userAuthContainer');
     if (puter.auth.isSignedIn()) {
@@ -90,17 +113,13 @@ async function initApp() {
                         <button onclick="handleLogout()" class="opt-btn logout-btn">Logout</button>
                     </div>
                 </div>`;
-            document.getElementById('navAvatarBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('profileCard').classList.toggle('show'); };
+            document.getElementById('navAvatarBtn').onclick = (e) => { 
+                e.stopPropagation(); 
+                document.getElementById('profileCard').classList.toggle('show'); 
+            };
+            document.onclick = () => document.getElementById('profileCard')?.classList.remove('show');
         }
         if (document.getElementById('uploadForm')) document.getElementById('uploadForm').style.display = 'block';
         if (document.getElementById('loginRequiredMessage')) document.getElementById('loginRequiredMessage').style.display = 'none';
     } else {
-        if (container) container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
-    }
-    loadContent();
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    while (typeof puter === 'undefined' || !puter.auth) await new Promise(r => setTimeout(r, 100));
-    initApp();
-});
+        if (c
