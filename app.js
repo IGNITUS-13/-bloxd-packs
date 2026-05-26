@@ -1,141 +1,106 @@
 const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
 
-// FUNCIONES DE ACCESO
-async function handleLogin() {
-    await puter.auth.signIn();
-    location.reload();
-}
+// --- PERFIL Y AUTH ---
+async function handleLogin() { await puter.auth.signIn(); location.reload(); }
+function handleLogout() { puter.auth.signOut(); location.reload(); }
 
-function handleLogout() {
-    puter.auth.signOut();
-    location.reload();
-}
-
-// CAMBIAR NOMBRE (Actualización instantánea)
 async function editName() {
-    const newName = prompt("Enter your new creator name:");
-    if (newName && newName.trim() !== "") {
-        const cleanedName = newName.trim();
-        await puter.kv.set('user_name', cleanedName);
-        
-        // Actualizar en la pantalla de inmediato
-        const nameLabel = document.querySelector('.display-name');
-        if (nameLabel) nameLabel.innerText = cleanedName;
-    }
+    const n = prompt("New Name:");
+    if (n) { await puter.kv.set('user_name', n); location.reload(); }
 }
 
-// CAMBIAR FOTO (Actualización instantánea + Círculos)
 async function uploadPhoto(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = async function(e) {
-        const imageUrl = e.target.result;
-        
-        // Guardar en la base de datos de Puter
-        await puter.kv.set('user_avatar', imageUrl);
-        
-        // Actualizar todas las fotos en la pantalla de inmediato
-        const navAvatar = document.getElementById('navAvatarBtn');
-        const avatarBig = document.querySelector('.avatar-big');
-        
-        if (navAvatar) navAvatar.src = imageUrl;
-        if (avatarBig) avatarBig.src = imageUrl;
+    reader.onload = async (e) => {
+        await puter.kv.set('user_avatar', e.target.result);
+        location.reload();
     };
     reader.readAsDataURL(file);
 }
 
-// Cargar datos del leaderboard de creadores
-async function loadLeaderboard() {
-    const creators = [
-        { rank: 1, name: 'Creator1', packs: 15, stars: 342 },
-        { rank: 2, name: 'Creator2', packs: 12, stars: 298 },
-        { rank: 3, name: 'IGNITUS', packs: 8, stars: 156 }
-    ];
+// --- LÓGICA DE PACKS (SUBIR) ---
+async function publishPack() {
+    const name = document.getElementById('pName').value;
+    const res = document.getElementById('pRes').value;
+    if (!name) return alert("Enter pack name!");
 
-    const leaderboardBody = document.getElementById('leaderboardBody');
-    if (leaderboardBody) {
-        leaderboardBody.innerHTML = creators.map(c => `
-            <tr>
-                <td>${c.rank}</td>
-                <td>${c.name}</td>
-                <td>${c.packs}</td>
-                <td>⭐ ${c.stars}</td>
-            </tr>
+    const user = await puter.auth.getUser();
+    const creator = await puter.kv.get('user_name') || user.username;
+
+    const newPack = { name, res, creator, date: Date.now(), stars: 0 };
+    let list = await puter.kv.get('community_packs') || [];
+    list.unshift(newPack); // Poner al principio
+    await puter.kv.set('community_packs', list);
+
+    alert("Pack Published!");
+    window.location.href = "discover.html";
+}
+
+// --- CARGAR DATOS EN LAS PÁGINAS ---
+async function loadContent() {
+    const packs = await puter.kv.get('community_packs') || [];
+    const grid = document.getElementById('packsGrid');
+    const tbody = document.getElementById('leaderboardBody');
+
+    // 1. Mostrar Packs (Home/Discover)
+    if (grid) {
+        grid.innerHTML = packs.length ? packs.map(p => `
+            <div class="pack-card">
+                <div class="pack-img" style="display:flex; align-items:center; justify-content:center; color:#222">No Preview</div>
+                <div class="pack-info">
+                    <h3 style="margin:0; color:var(--neon)">${p.name}</h3>
+                    <p style="font-size:0.8rem; color:#8b949e">by ${p.creator} | ${p.res}</p>
+                </div>
+            </div>
+        `).join('') : '<p>No packs yet.</p>';
+    }
+
+    // 2. Leaderboard Real
+    if (tbody) {
+        const stats = {};
+        packs.forEach(p => stats[p.creator] = (stats[p.creator] || 0) + 1);
+        const sorted = Object.keys(stats).map(name => ({name, count: stats[name]})).sort((a,b) => b.count - a.count);
+        tbody.innerHTML = sorted.map((c, i) => `
+            <tr><td>${i+1}</td><td>${c.name}</td><td>${c.count}</td><td>⭐ 0</td></tr>
         `).join('');
     }
 }
 
-// CONSTRUIR LA INTERFAZ
+// --- INICIALIZAR ---
 async function initApp() {
     const container = document.getElementById('userAuthContainer');
-    const uploadForm = document.getElementById('uploadForm');
-    const loginMsg = document.getElementById('loginRequiredMessage');
-    const leaderboardBody = document.getElementById('leaderboardBody');
-
     if (puter.auth.isSignedIn()) {
         const user = await puter.auth.getUser();
+        const name = await puter.kv.get('user_name') || user.username;
+        const avatar = await puter.kv.get('user_avatar') || 'https://via.placeholder.com/100';
         
-        const savedName = await puter.kv.get('user_name') || user.username;
-        const savedAvatar = await puter.kv.get('user_avatar') || 'https://via.placeholder.com/100?text=User';
-
         if (container) {
             container.innerHTML = `
                 <div class="profile-wrapper">
-                    <img src="${savedAvatar}" class="nav-avatar" id="navAvatarBtn">
+                    <img src="${avatar}" class="nav-avatar" id="navAvatarBtn">
                     <div class="profile-card" id="profileCard">
                         <div class="avatar-big-wrapper">
-                            <img src="${savedAvatar}" class="avatar-big">
-                            <label for="fileInput" class="camera-overlay">
-                                <span>📷</span>
-                                <input type="file" id="fileInput" hidden accept="image/*" onchange="uploadPhoto(event)">
-                            </label>
+                            <img src="${avatar}" class="avatar-big">
+                            <label for="fIn" class="camera-overlay">📷<input type="file" id="fIn" hidden onchange="uploadPhoto(event)"></label>
                         </div>
-                        <h3 class="display-name">${savedName}</h3>
-                        <p class="user-email">${user.email || 'Bloxd Creator'}</p>
+                        <h3 class="display-name">${name}</h3>
                         <button onclick="editName()" class="opt-btn">✏️ Edit Name</button>
                         <button onclick="handleLogout()" class="opt-btn logout-btn">Logout</button>
                     </div>
-                </div>
-            `;
-
-            const btn = document.getElementById('navAvatarBtn');
-            const card = document.getElementById('profileCard');
-            if (btn && card) {
-                btn.onclick = (e) => { e.stopPropagation(); card.classList.toggle('show'); };
-                document.onclick = () => card.classList.remove('show');
-                card.onclick = (e) => e.stopPropagation();
-            }
+                </div>`;
+            document.getElementById('navAvatarBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('profileCard').classList.toggle('show'); };
         }
-
-        // MOSTRAR FORMULARIOS DE UPLOAD
-        if (uploadForm) uploadForm.style.display = 'block';
-        if (loginMsg) loginMsg.style.display = 'none';
-
-        // Cargar datos de creadores
-        if (leaderboardBody) {
-            await loadLeaderboard();
-        }
-
+        if (document.getElementById('uploadForm')) document.getElementById('uploadForm').style.display = 'block';
+        if (document.getElementById('loginRequiredMessage')) document.getElementById('loginRequiredMessage').style.display = 'none';
     } else {
-        if (container) {
-            container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
-        }
-        if (uploadForm) uploadForm.style.display = 'none';
-        if (loginMsg) loginMsg.style.display = 'block';
+        if (container) container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
     }
+    loadContent();
 }
 
-// Esperar a que Puter cargue
-async function waitForPuter() {
-    while (typeof puter === 'undefined' || !puter.auth) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-}
-
-// Iniciar la app cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', async () => {
-    await waitForPuter();
+    while (typeof puter === 'undefined' || !puter.auth) await new Promise(r => setTimeout(r, 100));
     initApp();
 });
