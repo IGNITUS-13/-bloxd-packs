@@ -1,34 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Discover - BLOXD PACKS</title>
-<link rel="stylesheet" href="styles.css">
-<style>
-.container { max-width: 1000px; margin: 60px auto; text-align: center; padding: 20px; }
-.search-bar { width: 100%; max-width: 500px; padding: 15px 25px; border-radius: 50px;
-background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; outline: none;
-font-size: 1rem; }
-.search-bar::placeholder { color: #8b949e; }
-</style>
+    <meta charset="UTF-8">
+    <title>Discover - BLOXD PACKS</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container { max-width: 1000px; margin: 60px auto; text-align: center; padding: 20px; }
+        .search-bar { width: 100%; max-width: 500px; padding: 15px 25px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; outline: none; font-size: 1rem; }
+        .search-bar::placeholder { color: #8b949e; }
+    </style>
 </head>
 <body>
-<nav>
-<a href="index.html" class="logo">BLOXD PACKS</a>
-<div class="menu">
-<a href="index.html">Home</a>
-<a href="discover.html" style="color:var(--neon)">Discover</a>
-<a href="upload.html">Upload</a>
-<a href="creators.html">Creators</a>
-<div id="userAuthContainer"></div>
-</div>
-</nav>
-<div class="container">
-<h1 style="text-shadow: 0 0 15px var(--neon);">🔍 Discover Packs</h1>
-<input type="text" class="search-bar" placeholder="Search by name or creator...">
-<div id="packsGrid" style="margin-top:50px; color:#444;">No packs uploaded yet.</div>
-</div>
-<script src="https://puter.com"></script>
-<script src="app.js"></script>
+    <nav>
+        <a href="index.html" class="logo">BLOXD PACKS</a>
+        <div class="menu">
+            <a href="index.html">Home</a>
+            <a href="discover.html" style="color:var(--neon)">Discover</a>
+            <a href="upload.html">Upload</a>
+            <a href="creators.html">Creators</a>
+            <div id="userAuthContainer"></div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 style="text-shadow: 0 0 15px var(--neon);">🔍 Discover Packs</h1>
+        <input type="text" class="search-bar" placeholder="Search by name or creator...">
+        <div id="packsGrid" style="margin-top:50px; color:#444;">No packs uploaded yet.</div>
+    </div>
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="app.js"></script>
 </body>
 </html>
