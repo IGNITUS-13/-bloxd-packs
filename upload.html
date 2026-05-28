@@ -43,13 +43,14 @@
             <div class="section-title">1. Basic Info</div>
             <input type="text" id="pName" placeholder="Pack Name">
             <select id="pRes"><option>16x16</option><option>32x32</option><option>64x64</option></select>
-            <label style="font-size:0.8rem; color:#8b949e;">Pack File (.json/.txt)</label>
-            <input type="file">
+            
+            <!-- CAMBIO AQUÍ: Se quitó el input de archivo físico y se puso la caja de texto para el enlace externo de descarga -->
+            <label style="font-size:0.8rem; color:#8b949e; display:block; margin-bottom:5px;">Download Link</label>
+            <input type="url" id="pDownloadLink" placeholder="bloxd.io texture pack link for download it can be mediafire,google drive file, or other...">
 
             <div class="section-title">2. Media</div>
-            <input type="url" placeholder="YouTube Video URL">
-            <label style="font-size:0.8rem; color:#8b949e;">Cover Image (Banner)</label>
-            <!-- CAMBIO AQUÍ: Añadido id="pBanner" para poder verificarlo en app.js -->
+            <input type="url" id="pYoutube" placeholder="YouTube Video URL">
+            <label style="font-size:0.8rem; color:#8b949e; display:block; margin-bottom:5px;">Cover Image (Banner)</label>
             <input type="file" id="pBanner" accept="image/*">
 
             <div class="section-title">3. Tags</div>
