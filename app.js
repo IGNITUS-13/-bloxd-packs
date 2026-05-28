@@ -1,84 +1,85 @@
 const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
 
-// FUNCIONES DE ACCESO
-async function handleLogin() {
-    await puter.auth.signIn();
-    location.reload();
-}
+async function handleLogin() { await puter.auth.signIn(); location.reload(); }
+function handleLogout() { puter.auth.signOut(); location.reload(); }
 
-function handleLogout() {
-    puter.auth.signOut();
-    location.reload();
-}
-
-// CAMBIAR NOMBRE (Actualización instantánea)
 async function editName() {
     const newName = prompt("Enter your new creator name:");
     if (newName && newName.trim() !== "") {
-        const cleanedName = newName.trim();
-        await puter.kv.set('user_name', cleanedName);
-        
-        // Actualizar en la pantalla de inmediato
-        const nameLabel = document.querySelector('.display-name');
-        if (nameLabel) nameLabel.innerText = cleanedName;
+        const cleaned = newName.trim();
+        await puter.kv.set('user_name', cleaned);
+        const label = document.querySelector('.display-name');
+        if (label) label.innerText = cleaned;
     }
 }
 
-// CAMBIAR FOTO (Actualización instantánea + Círculos)
 async function uploadPhoto(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = async function(e) {
-        const imageUrl = e.target.result;
-        
-        // Guardar en la base de datos de Puter
-        await puter.kv.set('user_avatar', imageUrl);
-        
-        // Actualizar todas las fotos en la pantalla de inmediato
-        const navAvatar = document.getElementById('navAvatarBtn');
-        const avatarBig = document.querySelector('.avatar-big');
-        
-        if (navAvatar) navAvatar.src = imageUrl;
-        if (avatarBig) avatarBig.src = imageUrl;
+        const imgUrl = e.target.result;
+        await puter.kv.set('user_avatar', imgUrl);
+        const nav = document.getElementById('navAvatarBtn');
+        const big = document.querySelector('.avatar-big');
+        if (nav) nav.src = imgUrl;
+        if (big) big.src = imgUrl;
     };
     reader.readAsDataURL(file);
 }
 
-// Cargar datos del leaderboard de creadores
 async function loadLeaderboard() {
     const creators = [
         { rank: 1, name: 'Creator1', packs: 15, stars: 342 },
         { rank: 2, name: 'Creator2', packs: 12, stars: 298 },
         { rank: 3, name: 'IGNITUS', packs: 8, stars: 156 }
     ];
-
-    const leaderboardBody = document.getElementById('leaderboardBody');
-    if (leaderboardBody) {
-        leaderboardBody.innerHTML = creators.map(c => `
-            <tr>
-                <td>${c.rank}</td>
-                <td>${c.name}</td>
-                <td>${c.packs}</td>
-                <td>⭐ ${c.stars}</td>
-            </tr>
-        `).join('');
+    const body = document.getElementById('leaderboardBody');
+    if (body) {
+        body.innerHTML = creators.map(c => `<tr><td>${c.rank}</td><td>${c.name}</td><td>${c.packs}</td><td>⭐ ${c.stars}</td></tr>`).join('');
     }
 }
 
-// CONSTRUIR LA INTERFAZ
 async function initApp() {
     const container = document.getElementById('userAuthContainer');
     const uploadForm = document.getElementById('uploadForm');
     const loginMsg = document.getElementById('loginRequiredMessage');
     const leaderboardBody = document.getElementById('leaderboardBody');
 
+    const recentGrid = document.getElementById('recentPacksGrid');
+    if (recentGrid) {
+        try {
+            const raw = await puter.kv.get('uploaded_packs');
+            if (raw) {
+                const packs = JSON.parse(raw);
+                if (packs.length === 0) {
+                    recentGrid.innerHTML = `<p style="color:#8b949e;grid-column:1/-1;text-align:center;">No packs published yet.</p>`;
+                } else {
+                    recentGrid.innerHTML = packs.slice(0, 10).map(p => `
+                        <div class="pack-card">
+                            <img src="${p.banner || 'https://placeholder.com'}" class="pack-banner">
+                            <div class="pack-info">
+                                <h3 class="pack-title">${p.name}</h3>
+                                <div class="pack-meta">By <b>${p.creator}</b> • ${p.resolution}</div>
+                                <div class="pack-tags">${p.tags.map(t => `<span class="pack-tag-badge">${t}</span>`).join('')}</div>
+                                <div style="margin-top:15px;display:flex;gap:10px;">
+                                    <a href="${p.downloadUrl}" target="_blank" class="opt-btn" style="text-decoration:none;font-size:0.8rem;background:#00ffcc;color:#000;font-weight:bold;text-align:center;">⬇️ Download</a>
+                                    ${p.youtube ? `<a href="${p.youtube}" target="_blank" class="opt-btn" style="text-decoration:none;font-size:0.8rem;text-align:center;">📺 Video</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                recentGrid.innerHTML = `<p style="color:#8b949e;grid-column:1/-1;text-align:center;">No packs published yet.</p>`;
+            }
+        } catch (err) { recentGrid.innerHTML = `<p style="color:#ff4b4b;grid-column:1/-1;text-align:center;">Error loading packs.</p>`; }
+    }
+
     if (puter.auth.isSignedIn()) {
         const user = await puter.auth.getUser();
-        
         const savedName = await puter.kv.get('user_name') || user.username;
-        const savedAvatar = await puter.kv.get('user_avatar') || 'https://via.placeholder.com/100?text=User';
+        const savedAvatar = await puter.kv.get('user_avatar') || 'https://placeholder.com';
 
         if (container) {
             container.innerHTML = `
@@ -87,19 +88,14 @@ async function initApp() {
                     <div class="profile-card" id="profileCard">
                         <div class="avatar-big-wrapper">
                             <img src="${savedAvatar}" class="avatar-big">
-                            <label for="fileInput" class="camera-overlay">
-                                <span>📷</span>
-                                <input type="file" id="fileInput" hidden accept="image/*" onchange="uploadPhoto(event)">
-                            </label>
+                            <label for="fileInput" class="camera-overlay"><span>📷</span><input type="file" id="fileInput" hidden accept="image/*" onchange="uploadPhoto(event)"></label>
                         </div>
                         <h3 class="display-name">${savedName}</h3>
                         <p class="user-email">${user.email || 'Bloxd Creator'}</p>
                         <button onclick="editName()" class="opt-btn">✏️ Edit Name</button>
                         <button onclick="handleLogout()" class="opt-btn logout-btn">Logout</button>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             const btn = document.getElementById('navAvatarBtn');
             const card = document.getElementById('profileCard');
             if (btn && card) {
@@ -108,117 +104,65 @@ async function initApp() {
                 card.onclick = (e) => e.stopPropagation();
             }
         }
-
-        // MOSTRAR FORMULARIOS DE UPLOAD
         if (uploadForm) uploadForm.style.display = 'block';
         if (loginMsg) loginMsg.style.display = 'none';
-
-        // Cargar datos de creadores
-        if (leaderboardBody) {
-            await loadLeaderboard();
-        }
-
+        if (leaderboardBody) await loadLeaderboard();
     } else {
-        if (container) {
-            container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
-        }
+        if (container) container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
         if (uploadForm) uploadForm.style.display = 'none';
         if (loginMsg) loginMsg.style.display = 'block';
     }
 }
 
-// Esperar a que Puter cargue
-async function waitForPuter() {
-    while (typeof puter === 'undefined' || !puter.auth) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-}
+async function waitForPuter() { while (typeof puter === 'undefined' || !puter.auth) { await new Promise(r => setTimeout(r, 100)); } }
+document.addEventListener('DOMContentLoaded', async () => { await waitForPuter(); initApp(); });
 
-// Iniciar la app cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', async () => {
-    await waitForPuter();
-    initApp();
-});
-
-
-// ==========================================
-// NUEVA FUNCIÓN: ACCIÓN DEL BOTÓN PUBLISH PACK
-// ==========================================
 document.addEventListener('click', async (event) => {
     if (event.target && event.target.classList.contains('publish-btn')) {
         event.preventDefault();
+        const pNameInp = document.getElementById('pName');
+        const pResInp = document.getElementById('pRes');
+        const pLinkInp = document.getElementById('pDownloadLink');
+        const pYtInp = document.getElementById('pYoutube');
+        const pBannerInp = document.getElementById('pBanner');
 
-        // Capturar los valores del formulario de forma segura
-        const packNameInput = document.getElementById('pName');
-        const packName = packNameInput ? packNameInput.value.trim() : '';
-        
-        const packResolutionInput = document.getElementById('pRes');
-        const packResolution = packResolutionInput ? packResolutionInput.value : '16x16';
-        
-        const youtubeInput = document.querySelector('input[type="url"]');
-        const youtubeUrl = youtubeInput ? youtubeInput.value.trim() : '';
+        const name = pNameInp ? pNameInp.value.trim() : '';
+        const res = pResInp ? pResInp.value : '16x16';
+        const dUrl = pLinkInp ? pLinkInp.value.trim() : '';
+        const yt = pYtInp ? pYtInp.value.trim() : '';
+        const bFile = pBannerInp && pBannerInp.files ? pBannerInp.files[0] : null;
 
-        // Validar que el campo obligatorio de nombre no esté vacío
-        if (!packName) {
-            alert("Please enter a Pack Name before publishing.");
-            return;
-        }
+        if (!name) { alert("⚠️ Please enter a Pack Name."); return; }
+        if (!dUrl) { alert("⚠️ Please provide a download link."); return; }
+        if (!bFile) { alert("⚠️ Cover Image (Banner) is required!"); return; }
 
-        // Capturar las etiquetas que el usuario seleccionó
-        const selectedTags = [];
-        const checkboxes = document.querySelectorAll('.tags-grid input[type="checkbox"]');
-        checkboxes.forEach(box => {
-            if (box.checked) {
-                selectedTags.push(box.parentElement.innerText.trim());
-            }
-        });
+        const tags = [];
+        document.querySelectorAll('.tags-grid input[type="checkbox"]').forEach(box => { if (box.checked) tags.push(box.parentElement.innerText.trim()); });
 
-        // Feedback visual en el botón
         const originalText = event.target.innerText;
         event.target.innerText = "PUBLISHING...";
         event.target.disabled = true;
 
-        try {
-            // Obtener packs existentes de Puter KV
-            const existingPacksRaw = await puter.kv.get('uploaded_packs');
-            let packsList = [];
-            if (existingPacksRaw) {
-                packsList = JSON.parse(existingPacksRaw);
-            }
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const raw = await puter.kv.get('uploaded_packs');
+                let list = raw ? JSON.parse(raw) : [];
+                const nameLabel = document.querySelector('.display-name');
+                const creator = nameLabel ? nameLabel.innerText : 'Unknown Creator';
 
-            // Obtener nombre del creador activo
-            const nameLabel = document.querySelector('.display-name');
-            const creatorName = nameLabel ? nameLabel.innerText : 'Unknown';
+                list.unshift({ id: 'pack-' + Date.now(), name: name, resolution: res, downloadUrl: dUrl, youtube: yt, tags: tags, banner: e.target.result, creator: creator, date: new Date().toLocaleDateString() });
+                await puter.kv.set('uploaded_packs', JSON.stringify(list));
 
-            // Estructura del nuevo pack a guardar
-            const newPack = {
-                id: 'pack-' + Date.now(),
-                name: packName,
-                resolution: packResolution,
-                youtube: youtubeUrl,
-                tags: selectedTags,
-                creator: creatorName,
-                date: new Date().toLocaleDateString()
-            };
-
-            // Guardar lista actualizada en Puter
-            packsList.push(newPack);
-            await puter.kv.set('uploaded_packs', JSON.stringify(packsList));
-
-            alert("🚀 Pack published successfully!");
-            
-            // Limpiar el formulario tras publicar exitosamente
-            if (packNameInput) packNameInput.value = '';
-            if (youtubeInput) youtubeInput.value = '';
-            checkboxes.forEach(box => box.checked = false);
-
-        } catch (error) {
-            console.error("Error saving pack:", error);
-            alert("❌ Error publishing pack. Please try again.");
-        } finally {
-            // Restaurar estado del botón
-            event.target.innerText = originalText;
-            event.target.disabled = false;
-        }
+                alert("🚀 Pack published successfully!");
+                if (pNameInp) pNameInp.value = '';
+                if (pLinkInp) pLinkInp.value = '';
+                if (pYtInp) pYtInp.value = '';
+                if (pBannerInp) pBannerInp.value = '';
+                document.querySelectorAll('.tags-grid input[type="checkbox"]').forEach(b => b.checked = false);
+            } catch (err) { alert("❌ Error publishing pack."); }
+            finally { event.target.innerText = originalText; event.target.disabled = false; }
+        };
+        reader.readAsDataURL(bFile);
     }
 });
