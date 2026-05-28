@@ -1,48 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOXD PACKS | Home</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        .hero { text-align: center; margin: 100px auto 40px; max-width: 800px; padding: 0 20px; }
-        .hero h1 { font-size: 3.5rem; margin: 0 0 20px; background: linear-gradient(90deg, #fff, #00ffcc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; text-shadow: 0 0 20px rgba(0, 255, 204, 0.2); }
-        .hero p { color: #8b949e; font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto 30px; }
-        .featured-btn { background: #00ffcc; color: #000; font-weight: bold; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; box-shadow: 0 0 15px rgba(0,255,204,0.4); transition: 0.3s; }
-        .featured-btn:hover { background: #00b8cc; box-shadow: 0 0 25px rgba(0,212,255,0.6); }
+const APP_ID = "app-342aac80-710a-4d32-92a7-576ffae95775";
+
+async function handleLogin() { await puter.auth.signIn(); location.reload(); }
+function handleLogout() { puter.auth.signOut(); location.reload(); }
+
+async function editName() {
+    const newName = prompt("Enter your new creator name:");
+    if (newName && newName.trim() !== "") {
+        const cleaned = newName.trim();
+        await puter.kv.set('user_name', cleaned);
+        const label = document.querySelector('.display-name');
+        if (label) label.innerText = cleaned;
+    }
+}
+
+async function uploadPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const imgUrl = e.target.result;
+        await puter.kv.set('user_avatar', imgUrl);
+        const nav = document.getElementById('navAvatarBtn');
+        const big = document.querySelector('.avatar-big');
+        if (nav) nav.src = imgUrl;
+        if (big) big.src = imgUrl;
+    };
+    reader.readAsDataURL(file);
+}
+
+async function loadLeaderboard() {
+    const creators = [
+        { rank: 1, name: 'Creator1', packs: 15, stars: 342 },
+        { rank: 2, name: 'Creator2', packs: 12, stars: 298 },
+        { rank: 3, name: 'IGNITUS', packs: 8, stars: 156 }
+    ];
+    const body = document.getElementById('leaderboardBody');
+    if (body) {
+        body.innerHTML = creators.map(c => `<tr><td>${c.rank}</td><td>${c.name}</td><td>${c.packs}</td><td>⭐ ${c.stars}</td></tr>`).join('');
+    }
+}
+
+async function initApp() {
+    const container = document.getElementById('userAuthContainer');
+    const uploadForm = document.getElementById('uploadForm');
+    const loginMsg = document.getElementById('loginRequiredMessage');
+    const leaderboardBody = document.getElementById('leaderboardBody');
+
+    const recentGrid = document.getElementById('recentPacksGrid');
+    if (recentGrid) {
+        try {
+            const raw = await puter.kv.get('uploaded_packs');
+            if (raw) {
+                const packs = JSON.parse(raw);
+                if (packs.length === 0) {
+                    recentGrid.innerHTML = `<p style="color:#8b949e;grid-column:1/-1;text-align:center;">No packs published yet. Be the first!</p>`;
+                } else {
+                    // CORRECCIÓN: Eliminadas las barras invertidas que rompían la inyección del código
+                    recentGrid.innerHTML = packs.slice(0, 10).map(p => `
+                        <div class="pack-card">
+                            <img src="${p.banner || 'https://placeholder.com'}" class="pack-banner">
+                            <div class="pack-info">
+                                <h3 class="pack-title">${p.name}</h3>
+                                <div class="pack-meta">By <b>${p.creator}</b> • ${p.resolution}</div>
+                                <div class="pack-tags">${p.tags.map(t => `<span class="pack-tag-badge">${t}</span>`).join('')}</div>
+                                <div style="margin-top:15px;display:flex;gap:10px;">
+                                    <a href="${p.downloadUrl}" target="_blank" class="opt-btn" style="text-decoration:none;font-size:0.8rem;background:#00ffcc;color:#000;font-weight:bold;text-align:center;">⬇️ Download</a>
+                                    ${p.youtube ? `<a href="${p.youtube}" target="_blank" class="opt-btn" style="text-decoration:none;font-size:0.8rem;text-align:center;">📺 Video</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                recentGrid.innerHTML = `<p style="color:#8b949e;grid-column:1/-1;text-align:center;">No packs published yet. Be the first!</p>`;
+            }
+        } catch (err) { recentGrid.innerHTML = `<p style="color:#ff4b4b;grid-column:1/-1;text-align:center;">Error loading packs.</p>`; }
+    }
+
+    if (puter.auth.isSignedIn()) {
+        const user = await puter.auth.getUser();
+        const savedName = await puter.kv.get('user_name') || user.username;
+        const savedAvatar = await puter.kv.get('user_avatar') || 'https://placeholder.com';
+
+        if (container) {
+            container.innerHTML = `
+                <div class="profile-wrapper">
+                    <img src="${savedAvatar}" class="nav-avatar" id="navAvatarBtn">
+                    <div class="profile-card" id="profileCard">
+                        <div class="avatar-big-wrapper">
+                            <img src="${savedAvatar}" class="avatar-big">
+                            <label for="fileInput" class="camera-overlay"><span>📷</span><input type="file" id="fileInput" hidden accept="image/*" onchange="uploadPhoto(event)"></label>
+                        </div>
+                        <h3 class="display-name">${savedName}</h3>
+                        <p class="user-email">${user.email || 'Bloxd Creator'}</p>
+                        <button onclick="editName()" class="opt-btn">✏️ Edit Name</button>
+                        <button onclick="handleLogout()" class="opt-btn logout-btn">Logout</button>
+                    </div>
+                </div>`;
+            const btn = document.getElementById('navAvatarBtn');
+            const card = document.getElementById('profileCard');
+            if (btn && card) {
+                btn.onclick = (e) => { e.stopPropagation(); card.classList.toggle('show'); };
+                document.onclick = () => card.classList.remove('show');
+                card.onclick = (e) => e.stopPropagation();
+            }
+        }
+        if (uploadForm) uploadForm.style.display = 'block';
+        if (loginMsg) loginMsg.style.display = 'none';
+        if (leaderboardBody) await loadLeaderboard();
+    } else {
+        if (container) container.innerHTML = `<button class="login-btn" onclick="handleLogin()">Login</button>`;
+        if (uploadForm) uploadForm.style.display = 'none';
+        if (loginMsg) loginMsg.style.display = 'block';
+    }
+}
+
+async function waitForPuter() { while (typeof puter === 'undefined' || !puter.auth) { await new Promise(r => setTimeout(r, 100)); } }
+document.addEventListener('DOMContentLoaded', async () => { await waitForPuter(); initApp(); });
+
+// ESCUCHADOR PARA PUBLICAR (REAL Y VERIFICADO)
+document.addEventListener('click', async (event) => {
+    if (event.target && event.target.classList.contains('publish-btn')) {
+        event.preventDefault();
         
-        .recent-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; }
-        .section-title { font-size: 1.8rem; color: #00ffcc; margin-bottom: 30px; border-bottom: 2px solid rgba(0, 255, 204, 0.1); padding-bottom: 10px; font-weight: bold; text-shadow: 0 0 10px rgba(0,255,204,0.2); }
-        .packs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="index.html" class="logo">BLOXD PACKS</a>
-        <div class="menu">
-            <a href="index.html" style="color:var(--neon)">Home</a>
-            <a href="discover.html">Discover</a>
-            <a href="upload.html">Upload</a>
-            <a href="creators.html">Creators</a>
-            <div id="userAuthContainer"></div>
-        </div>
-    </nav>
+        const pNameInp = document.getElementById('pName');
+        const pResInp = document.getElementById('pRes');
+        const pLinkInp = document.getElementById('pDownloadLink');
+        const pYtInp = document.getElementById('pYoutube');
+        const pBannerInp = document.getElementById('pBanner');
 
-    <div class="hero">
-        <h1>Best PvP Texture Packs for Bloxd.io</h1>
-        <p>Explore the best custom textures designed to maximize your FPS, improve your combat precision in Bedwars, and fully customize your competitive experience inside Bloxd.io.</p>
-        <button class="featured-btn" onclick="document.getElementById('recentPacks').scrollIntoView({behavior: 'smooth'})">Discover Packs</button>
-    </div>
+        const name = pNameInp ? pNameInp.value.trim() : '';
+        const res = pResInp ? pResInp.value : '16x16';
+        const dUrl = pLinkInp ? pLinkInp.value.trim() : '';
+        const yt = pYtInp ? pYtInp.value.trim() : '';
+        const bFile = pBannerInp && pBannerInp.files ? pBannerInp.files[0] : null;
 
-    <div class="recent-section" id="recentPacks">
-        <h2 class="section-title">🔥 10 Most Recent Packs</h2>
-        <div class="packs-grid" id="recentPacksGrid">
-            <p style="color: #8b949e; text-align: center; grid-column: 1/-1;">Loading amazing texture packs...</p>
-        </div>
-    </div>
+        // Validaciones estrictas antes de procesar nada
+        if (!name) { alert("⚠️ Please enter a Pack Name."); return; }
+        if (!dUrl) { alert("⚠️ Please provide a download link."); return; }
+        if (!bFile) { alert("⚠️ Cover Image (Banner) is required!"); return; }
 
-    <script src="https://js.puter.com/v2/"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+        const tags = [];
+        document.querySelectorAll('.tags-grid input[type="checkbox"]').forEach(box => { if (box.checked) tags.push(box.parentElement.innerText.trim()); });
+
+        const originalText = event.target.innerText;
+        event.target.innerText = "PUBLISHING...";
+        event.target.disabled = true;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const raw = await puter.kv.get('uploaded_packs');
+                let list = raw ? JSON.parse(raw) : [];
+                const nameLabel = document.querySelector('.display-name');
+                const creator = nameLabel ? nameLabel.innerText : 'Unknown Creator';
+
+                // Guardado estructurado real
+                list.unshift({ 
+                    id: 'pack-' + Date.now(), 
+                    name: name, 
+                    resolution: res, 
+                    downloadUrl: dUrl, 
+                    youtube: yt, 
+                    tags: tags, 
+                    banner: e.target.result, 
+                    creator: creator, 
+                    date: new Date().toLocaleDateString() 
+                });
+                
+                await puter.kv.set('uploaded_packs', JSON.stringify(list));
+
+                alert("🚀 Pack published successfully!");
+                
+                // Limpiar el formulario completo tras el éxito real
+                if (pNameInp) pNameInp.value = '';
+                if (pLinkInp) pLinkInp.value = '';
+                if (pYtInp) pYtInp.value = '';
+                if (pBannerInp) pBannerInp.value = '';
+                document.querySelectorAll('.tags-grid input[type="checkbox"]').forEach(b => b.checked = false);
+                
+            } catch (err) { 
+                console.error(err);
+                alert("❌ Error saving to database."); 
+            } finally { 
+                event.target.innerText = originalText; 
+                event.target.disabled = false; 
+            }
+        };
+        reader.readAsDataURL(bFile);
+    }
+});
